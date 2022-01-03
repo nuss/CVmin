@@ -3,7 +3,7 @@ CVSync {
 	classvar <>all;
 	var <>cv, <>view;
 
-	*initClass {all = IdentityDictionary.new }
+	*initClass { all = IdentityDictionary.new }
 
 	*new { | cv, view | ^super.newCopyArgs(cv, view).init }
 
@@ -64,7 +64,7 @@ CVSyncValue : CVSync {				// used by NumberBox
 CVSyncMulti : CVSync {
 
 	linkToView {
-		view.thumbSize = (view.bounds.width - 16 /cv.value.size);
+		view.thumbSize = (view.bounds.width - 16 / cv.value.size);
 		view.xOffset = 0;
 		view.valueThumbSize = 1;
 		view.mouseUpAction = this;

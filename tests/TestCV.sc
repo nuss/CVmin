@@ -42,7 +42,6 @@ TestCV : UnitTest {
 		cv.addController({ |cv| });
 		this.assertEquals(cv.numControllers, 2, "The CV should have 2 actions added in 2 SimpleControllers");
 		cv.removeAllControllers;
-		0.1.wait;
 		this.assertEquals(cv.numControllers, 0, "All actions and controllers should have been removed from the CV");
 	}
 
@@ -109,6 +108,22 @@ TestCV : UnitTest {
 	test_buildViewDictionary {
 		this.assertEquals(CV.viewDictionary.class, IdentityDictionary, "Class CV's viewDictionary should be an IdentityDictionary");
 		this.assert(CV.viewDictionary.notEmpty, "Class CV's viewDictionary should not be empty");
+	}
+
+	test_connect {
+		var cv = CV([0, 5, \lin, 0, 2].asSpec);
+		var view = Slider();
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput before connecting a Slider to the CV");
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncInput after connecting a Slider to the CV");
+		cv.input_(0.1);
+		this.assertFloatEquals(view.value, cv.input, "A slider connected to a CV should have set its value accordingly upon setting the CV's value or input");
+		view = NumberBox();
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue before connecting a NumberBox to the CV");
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncValue after connecting a NumberBox to the CV");
+		cv.value_(4);
+		this.assertFloatEquals(view.value, cv.value, "A NumberBox connected to a CV should have set its value accordingly upon setting the CV's value or input");
 	}
 
 }

@@ -34,12 +34,17 @@ CV : Stream {
 
 	// SimpleControllers are easy to add and remove
 	// however, controllers remain 'hidden' to the users
-	// we're taking a shortcut here via Object's dependantsDictionary
+	// we're taking a shortcut here to Object's dependantsDictionary
 	// that way a CV doesn't need its own list for bookkeeping
 	numControllers {
-		if (dependantsDictionary[this].notNil) {
-			^dependantsDictionary[this].size;
-		} { ^0 }
+		var allControllers, cvDependants = dependantsDictionary[this];
+		cvDependants !? {
+			allControllers = cvDependants.select { |dep| dep.class === SimpleController };
+			if (allControllers.isEmpty) { ^0 } {
+				^allControllers.size;
+			}
+		};
+		^0
 	}
 
 	addController { |function|
@@ -47,7 +52,15 @@ CV : Stream {
 	}
 
 	removeAllControllers {
-		dependantsDictionary.removeAt(this)
+		var allControllers, cvDependants = dependantsDictionary[this];
+		cvDependants !? {
+			allControllers = cvDependants.select { |dep| dep.class === SimpleController };
+			if (allControllers.size < cvDependants.size) {
+				allControllers.do { |c| cvDependants.remove(c) }
+			} {
+				dependantsDictionary.removeAt(this)
+			}
+		}
 	}
 
 
