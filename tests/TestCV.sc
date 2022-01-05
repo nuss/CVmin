@@ -2,6 +2,9 @@ TestCV : UnitTest {
 
 	test_new {
 		var cv = CV.new;
+		cv.addController({});
+		cv = CV.new;
+		this.assert(dependantsDictionary[cv].isNil, "With the creation of a new CV there should be no entry for this CV in the dependantsDictionary");
 		this.assertEquals(cv.spec, ControlSpec(0, 1, 'linear', 0.0, 0, ""), "The default CV ControlSpec should be ControlSpec(0, 1, 'linear', 0.0, 0, ""). Actual value: %\n".format(cv.spec));
 		this.assertEquals(cv.value, 0, "The CV's value should be 0");
 		cv = CV([0, 5].asSpec);
@@ -97,7 +100,7 @@ TestCV : UnitTest {
 	test_embedInStream {
 		var cv = CV([0, 5, \lin, 0, 2].asSpec);
 		var stream;
-		// tests are running in a Routine themselves?
+		// tests are running in a Routine themselves :\
 		// this.assertException({ cv.embedInStream }, PrimitiveFailedError, "Trying to call embedInStream outside a Routine should throw a PrimitiveFailedError");
 		stream = Routine { cv.embedInStream };
 		this.assertFloatEquals(stream.next, 2.0, "embedInStream should yield the CV's value");
@@ -113,17 +116,68 @@ TestCV : UnitTest {
 	test_connect {
 		var cv = CV([0, 5, \lin, 0, 2].asSpec);
 		var view = Slider();
-		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput before connecting a Slider to the CV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput before connecting the CV to a Slider");
 		cv.connect(view);
-		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncInput after connecting a Slider to the CV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncInput after connecting the CV to a Slider");
 		cv.input_(0.1);
-		this.assertFloatEquals(view.value, cv.input, "A slider connected to a CV should have set its value accordingly upon setting the CV's value or input");
+		this.assertFloatEquals(view.value, cv.input, "A slider connected to a CV should have its value set accordingly upon setting the CV's value or input");
+		view.valueAction_(0.5);
+		this.assertEquals(view.value, cv.input, "A CV connected to a Slider should have its value and input set accordingly upon setting the Slider's valueAction");
+		cv.disconnect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput after disconnecting the CV from");
 		view = NumberBox();
-		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue before connecting a NumberBox to the CV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue before connecting the CV to a NumberBox");
 		cv.connect(view);
-		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncValue after connecting a NumberBox to the CV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncValue after connecting the CV to a NumberBox");
 		cv.value_(4);
-		this.assertFloatEquals(view.value, cv.value, "A NumberBox connected to a CV should have set its value accordingly upon setting the CV's value or input");
+		this.assertFloatEquals(view.value, cv.value, "A NumberBox connected to a CV should have its value set accordingly upon setting the CV's value or input");
+		view.valueAction_(3);
+		this.assertEquals(view.value, cv.value, "A CV connected to a NumberBox should have its value and input set accordingly upon setting the NumberBox's valueAction");
+		cv.disconnect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue after disconnecting the CV from the NumberBox");
+		view = Knob();
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput before connecting the CV to a Knob");
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncInput after connecting the CV to a Knob");
+		cv.input_(0.3);
+		this.assertFloatEquals(view.value, cv.input, "A Knob connected to a CV should have its value set accordingly upon setting the CV's value or input");
+		view.valueAction_(0.3);
+		this.assertEquals(view.value, cv.input, "A CV connected to a Knob should have its value and input set accordingly upon setting the Knob's valueAction");
+		cv.disconnect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncInput }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncInput after disconnecting the CV from the Knob");
+		view = Button().states_({|i| i+1}!5);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue before connecting the CV to a Button");
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncValue after connecting the CV to a Button");
+		cv.value_(3);
+		this.assertEquals(view.value, cv.value, "A Button connected to a CV should have its value set accordingly upon setting the CV's value or input");
+		view.valueAction_(2);
+		this.assertEquals(view.value, cv.value, "A CV connected to a Button should have its value and input set accordingly upon setting the Button's valueAction");
+		cv.disconnect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncValue }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncValue after disconnecting the CV from the Button");
+		view = MultiSliderView();
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncMulti }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncMulti before connecting the CV to a MultiSliderView");
+		// instead of simply setting a new spec create a new CV and make sure the dependantsDictionary is clean
+		// MultiSliderViews prefer fresh CVs, why ever....
+		cv = CV([0!3, 5!3].asSpec);
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncMulti }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncMulti after connecting the CV to a MultiSliderView");
+		cv.input_(0.2!3);
+		this.assertEquals(view.value, cv.input, "A MultiSliderView connected to a CV should have its value set accordingly upon setting the CV's value or input");
+		// MultiSliderView needs mouseUp to finish
+		view.valueAction_(0.1!3).mouseUp;
+		this.assertEquals(cv.input, view.value, "A CV connected to a MultiSliderView should have its value and input set accordingly upon setting the MultiSliderView's valueAction_(val).mouseUp");
+		cv.disconnect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncMulti }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncMulti after disconnecting the CV from the MultiSliderView");
+		view = TextView();
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncText }.size, 0, "The dependantsDictionary at our CV should include no instance of CVSyncText before connecting the CV to a TextView");
+		cv.connect(view);
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === CVSyncText }.size, 1, "The dependantsDictionary at our CV should include one instance of CVSyncMulti after connecting the CV to a TextView");
+		cv.value_([1, 2, 3, 4]);
+		this.assertEquals(view.string.interpret, cv.value, "A TextView connected to a CV should have its string set accordingly upon setting the CV's value or input");
+		// FIXME: What keyDown is needed?
+		view.string_("[4, 3, 2, 1]");
+		this.assertEquals(cv.value, view.string.interpret, "A CV connected to a TextView should have its value and input set accordingly upon setting the TextView's string_(stringval).keyUp");
 	}
 
 }

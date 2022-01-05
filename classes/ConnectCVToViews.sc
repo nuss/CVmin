@@ -65,6 +65,8 @@ CVSyncMulti : CVSync {
 
 	linkToView {
 		view.thumbSize = (view.bounds.width - 16 / cv.value.size);
+		view.isFilled_(true);
+		view.elasticMode_(true);
 		view.xOffset = 0;
 		view.valueThumbSize = 1;
 		view.mouseUpAction = this;

@@ -29,6 +29,7 @@ CV : Stream {
 	}
 
 	init { |value|
+		// clean up, if necessary
 		this.value_(value ? this.spec.default);
 	}
 
@@ -113,8 +114,6 @@ CV : Stream {
 			multiSliderView:CVSyncMulti,
 			popUpMenu:		SVSync,
 			listView:		SVSync,
-			ezSlider:		CVSyncValue,
-			ezNumber:		CVSyncValue,
 			knob:			CVSyncInput,
 			button:			CVSyncValue,
 			textView:		CVSyncText,
@@ -131,9 +130,8 @@ CV : Stream {
 			var class;
 			#[
 				numberBox, slider, rangeSlider, slider2D, multiSliderView,
-				popUpMenu, listView, ezSlider, ezNumber,
-				knob, button, textView, textField, staticText
-			].collect { | name |
+				popUpMenu, listView, knob, button, textView, textField, staticText
+			].collect { |name|
 				if ((class = gui.perform(name)).notNil) {
 					class = class.superclass;
 					this.viewDictionary.put(class, connectDictionary.at(name))
@@ -142,8 +140,18 @@ CV : Stream {
 		};
 	}
 
-	connect { | view |
-		CV.viewDictionary[view.class].new(this, view) ;
+	connect { |view|
+		this.class.viewDictionary[view.class].new(this, view) ;
+	}
+
+	// again we take a shortcut to the dependantsDictionary
+	disconnect { |view|
+		var cvsyncs = dependantsDictionary[this].select { |d| d.class !== SimpleController };
+		var selfsync = cvsyncs.detect { |s| s.view === view };
+		dependantsDictionary[this].remove(selfsync);
+		if (dependantsDictionary[this].isEmpty) {
+			dependantsDictionary.removeAt(this)
+		}
 	}
 
 	asControlInput { ^value.asControlInput }
