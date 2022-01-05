@@ -176,7 +176,7 @@ TestCV : UnitTest {
 		cv.value_([1, 2, 3, 4]);
 		this.assertEquals(view.string.interpret, cv.value, "A TextView connected to a CV should have its string set accordingly upon setting the CV's value or input");
 		// FIXME: What keyDown is needed?
-		view.string_("[4, 3, 2, 1]");
+		view.string_("[4, 3, 2, 1]").doAction;
 		this.assertEquals(cv.value, view.string.interpret, "A CV connected to a TextView should have its value and input set accordingly upon setting the TextView's string_(stringval).keyUp");
 	}
 

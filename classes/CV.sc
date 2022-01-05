@@ -1,13 +1,13 @@
 /*
- A CV models a value constrained by a ControlSpec. The value can be a single Float or an array of Floats.
+A CV models a value constrained by a ControlSpec. The value can be a single Float or an array of Floats.
 
- Whenever the CV's value changes, it sends a changed message labeled 'synch'.  This way dependants
- (such as GUI objects or server value) can be updated with SimpleControllers.  The method
- 		aCV-addController(function)
- creates such a connection.
+Whenever the CV's value changes, it sends a changed message labeled 'synch'.  This way dependants
+(such as GUI objects or server value) can be updated with SimpleControllers.  The method
+aCV-addController(function)
+creates such a connection.
 
- A CV's value can be read with the 'value' message.
- CV can also be used as a Pattern (in Pbind) or in combination with other Streams.
+A CV's value can be read with the 'value' message.
+CV can also be used as a Pattern (in Pbind) or in combination with other Streams.
 */
 
 CV : Stream {
@@ -111,7 +111,7 @@ CV : Stream {
 		var connectDictionary = (
 			numberBox:		CVSyncValue,
 			slider:			CVSyncInput,
-			multiSliderView:CVSyncMulti,
+			multiSliderView: CVSyncMulti,
 			popUpMenu:		SVSync,
 			listView:		SVSync,
 			knob:			CVSyncInput,
@@ -145,9 +145,10 @@ CV : Stream {
 	}
 
 	// nifty hack:
-	// CVSync.value(view) removes
-	// the object in CVSync.all and sets it tonil
-	// hence, it removes itself from the dependantsDictionary
+	// CVSync.value(view) removes the object
+	// in CVSync.all and sets it to nil.
+	// Hence, it is also removed from the
+	// Object.dependantsDictionary
 	disconnect { |view|
 		CVSync.value(view);
 	}
