@@ -5,7 +5,7 @@ CVSync {
 
 	*initClass { all = IdentityDictionary.new }
 
-	*new { | cv, view | ^super.newCopyArgs(cv, view).init }
+	*new { |cv, view| ^super.newCopyArgs(cv, view).init }
 
 
 	init {
@@ -20,11 +20,11 @@ CVSync {
 
 	linkToView {
 		view.action = this;
-		CVSync.all[view] = CVSync.all[view].add(this);
-		view.onClose = CVSync
+		all.put(view, this);
+		view.onClose = this.class;
 	}
 
-	update { | changer, what ...moreArgs |	// called when CV changes
+	update { |changer, what ...moreArgs|	// called when CV changes
 		switch( what,
 			\synch, { defer { view.value = cv.input }; }
 		);
@@ -32,15 +32,18 @@ CVSync {
 
 	value { cv.input = view.value }		// called when view changes
 
-	*value { | view | 					// called onClose
-		all[view].do(_.remove); all[view] = nil
+	// called onClose and
+	// CV:-disconnect
+	*value { |view| 					// called onClose
+		all[view].do(_.remove);
+		all[view] = nil
 	}
 
 	remove { cv.removeDependant(this) }
 }
 
 CVSyncInput : CVSync {
-	update { | changer, what ...moreArgs |	// called when CV changes
+	update { |changer, what ...moreArgs|	// called when CV changes
 		switch( what,
 			\synch, { defer { view.value = cv.input }; }
 		);
@@ -51,7 +54,7 @@ CVSyncInput : CVSync {
 
 CVSyncValue : CVSync {				// used by NumberBox
 
-	update { | changer, what ...moreArgs |
+	update { |changer, what ...moreArgs|
 		switch( what,
 			\synch, { defer { view.value = cv.value }; }
 		);
@@ -83,9 +86,9 @@ CVSyncMulti : CVSync {
 CVSyncProperty : CVSync {
 	var <>property;
 
-	*new { | cv, view, property | ^super.newCopyArgs(cv, view, property).init }
+	*new { |cv, view, property| ^super.newCopyArgs(cv, view, property).init }
 
-	update { | changer, what ...moreArgs |
+	update { |changer, what ...moreArgs|
 		switch( what,
 			\synch, { defer { view.setProperty(property, cv.input) }; }
 		);
@@ -104,10 +107,10 @@ CVSyncProperty : CVSync {
 CVSyncProperties : CVSync {
 	var <>links, <>view;
 
-	*new { | cvs, view, properties |
+	*new { |cvs, view, properties|
 		^super.new(cvs, view)
 			.view_(view)
-			.links_(properties.collect { | p, i | CVSyncProperty( cvs[i], view, p) })
+			.links_(properties.collect { |p, i| CVSyncProperty( cvs[i], view, p) })
 			.init
 
 	}
@@ -123,8 +126,8 @@ CVSyncProperties : CVSync {
 
 CVSyncProps {
 	var <>props;
-	*new { | props | ^super.newCopyArgs(props) }
-	new { | cv, view | ^CVSyncProperties(cv, view, props) }
+	*new { |props| ^super.newCopyArgs(props) }
+	new { |cv, view| ^CVSyncProperties(cv, view, props) }
 }
 
 
@@ -134,7 +137,7 @@ SVSync : CVSyncValue {
 		super.init;
 	}
 
-	update { | changer, what ...moreArgs |
+	update { |changer, what ...moreArgs|
 		switch( what,
 			\synch, { defer { view.value = cv.value }; },
 			\items, { defer { view.items = cv.items }; }
@@ -153,7 +156,7 @@ EVSync : CVSync {
 		view.onClose = CVSync
 	}
 
-	update { | changer, what ...moreArgs |	// called when CV changes
+	update { |changer, what ...moreArgs|	// called when CV changes
 		switch( what,
 			\synch, { defer { cv.evToView(view) } }
 		);
@@ -175,7 +178,7 @@ ConductorSync : CVSync {
 		view.onClose = CVSync;
 	}
 
-	update { | changer, what ...moreArgs |	// called when CV changes
+	update { |changer, what ...moreArgs|	// called when CV changes
 		switch( what,
 			\synch, { defer { view.value = cv.player.value } }
 		);
@@ -191,7 +194,7 @@ ConductorSync : CVSync {
 CVSyncText : CVSync {
 	classvar <>valRound=0.01;
 
-	update { | changer, what ... moreArgs |
+	update { |changer, what ... moreArgs|
 		switch( what,
 			\synch, { defer { view.string = cv.value.collect(_.round(valRound)).asCompileString }; }
 		);

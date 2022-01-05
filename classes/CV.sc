@@ -144,14 +144,12 @@ CV : Stream {
 		this.class.viewDictionary[view.class].new(this, view) ;
 	}
 
-	// again we take a shortcut to the dependantsDictionary
+	// nifty hack:
+	// CVSync.value(view) removes
+	// the object in CVSync.all and sets it tonil
+	// hence, it removes itself from the dependantsDictionary
 	disconnect { |view|
-		var cvsyncs = dependantsDictionary[this].select { |d| d.class !== SimpleController };
-		var selfsync = cvsyncs.detect { |s| s.view === view };
-		dependantsDictionary[this].remove(selfsync);
-		if (dependantsDictionary[this].isEmpty) {
-			dependantsDictionary.removeAt(this)
-		}
+		CVSync.value(view);
 	}
 
 	asControlInput { ^value.asControlInput }
