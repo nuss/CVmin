@@ -74,7 +74,8 @@ CVSyncMulti : CVSync {
 		view.valueThumbSize = 1;
 		view.mouseUpAction = this;
 
-		CVSync.all[view] = CVSync.all[view].add(this);
+		// CVSync.all[view] = CVSync.all[view].add(this);
+		all.put(view, this);
 		view.onClose = CVSync;
 	}
 }
@@ -110,9 +111,8 @@ CVSyncProperties : CVSync {
 	*new { |cvs, view, properties|
 		^super.new(cvs, view)
 			.view_(view)
-			.links_(properties.collect { |p, i| CVSyncProperty( cvs[i], view, p) })
+			.links_(properties.collect { |p, i| CVSyncProperty(cvs[i], view, p) })
 			.init
-
 	}
 
  	init {
@@ -152,7 +152,8 @@ EVSync : CVSync {
 
 	linkToView {
 		view.action = this;
-		CVSync.all[view] = CVSync.all[view].add(this);
+		// CVSync.all[view] = CVSync.all[view].add(this);
+		all.put(view, this);
 		view.onClose = CVSync
 	}
 
@@ -174,7 +175,8 @@ ConductorSync : CVSync {
 
 	linkToView {
 		view.action = this;
-		CVSync.all[view] = CVSync.all[view].add(this);
+		// CVSync.all[view] = CVSync.all[view].add(this);
+		all.put(view, this);
 		view.onClose = CVSync;
 	}
 

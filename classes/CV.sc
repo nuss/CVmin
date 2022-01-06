@@ -16,7 +16,7 @@ CV : Stream {
 	var <>spec, <value;
 
 	*initClass {
-		StartUp.add ({ CV.buildViewDictionary })
+		StartUp.add({ this.buildViewDictionary })
 	}
 
 	*new { |spec = \unipolar, value|
@@ -126,7 +126,7 @@ CV : Stream {
 
 		this.viewDictionary = IdentityDictionary.new;
 
-		GUI.schemes.do { | gui|
+		GUI.schemes.do { |gui|
 			var class;
 			#[
 				numberBox, slider, rangeSlider, slider2D, multiSliderView,
@@ -155,16 +155,16 @@ CV : Stream {
 
 	asControlInput { ^value.asControlInput }
 
-	asOSCArgEmbeddedArray { | array|
+	asOSCArgEmbeddedArray { |array|
 		^value.asOSCArgEmbeddedArray(array)
 	}
 
-	indexedBy { | key |
-		^Pfunc{ | ev | value.at(ev[key] ) }
+	indexedBy { |key|
+		^Pfunc{ |ev| value.at(ev[key] ) }
 	}
 
-	windex { | key |
-		^Pfunc{ | ev |
+	windex { |key|
+		^Pfunc{ |ev|
 			value.asArray.normalizeSum.windex
 		}
 	}
