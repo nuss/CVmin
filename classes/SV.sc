@@ -7,37 +7,51 @@ The default GUI presentation in ConductorGUI assumes that items is an array of S
 
 SV : CV {
 	var <items;
-	
-	*new {arg items, default; 			
-		^super.new.items_(items,default);
+
+	*new { |items, default|
+		// superclass CV's has two arguments
+		// simply pass in nil for them
+		^super.newCopyArgs(nil, nil, items).init(default);
 	}
 
-	items_ { | argItems, default = 0|
-		var index = 0;
+	init { |default|
+		this.spec_(ControlSpec(0, items.size - 1, \lin, 1, default ? 0));
+		this.value_(default);
+	}
+
+	default_ { |value|
+		var default;
+		if (value.isNumber.not) {
+			default = this.getIndex(value)
+		} {
+			default = value;
+		};
+		super.default_(default);
+	}
+
+	items_ { |argItems|
 		items = argItems ? [\nil];
-		if (default.isNumber.not) { default = this.getIndex(default) };
-		super.sp(default, 0, items.size - 1, 1, 'lin');
+		super.sp(this.spec.default, 0, items.size - 1, 1, 'lin');
 		this.changed(\items);
 	}
-	
-	item { ^items[value] }
 
-	item_ { | symbol |
+	item { ^items[this.value] }
+
+	item_ { |symbol|
 		this.value = this.getIndex(symbol);
 	}
-	
-	getIndex { | symbol |
-		items.do { | it, i| if (symbol == it) { ^i } };
+
+	getIndex { |symbol|
+		items.do { |it, i| if (symbol == it) { ^i } };
 		^0
 	}
-	
-	draw { |win, name =">"|
-		~svGUI.value(win, name, this);
+
+	sp { |default = 0, symbols|
+		this.items_(symbols);
+		this.default_(default);
 	}
-	
-	sp { | default = 0, symbols| this.items_(symbols, default) }
-	
+
 	next { ^items[value] }
-	
+
 }
 

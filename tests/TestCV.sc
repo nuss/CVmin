@@ -235,8 +235,29 @@ TestCV : UnitTest {
 		view.activey_(0.8);
 		this.assertFloatEquals(cv2.value, view.y, "The value of CV 2 should have been set to the y value of the Slider2D");
 		[cv1, cv2].disconnect(view);
-		this.assertEquals(dependantsDictionary[cv1].select { |d| d.class === CVSyncProperty }.size, 0, "The dependantsDictionary at our CV 1 should include no instance of CVSyncProperty after disconnecting CV 1 from the Slider2D");
-		this.assertEquals(dependantsDictionary[cv2].select { |d| d.class === CVSyncProperty }.size, 0, "The dependantsDictionary at our CV 2 should include no instance of CVSyncProperty after disconnecting CV 2 from the Slider2D");
+		cv = SV(#[gfejhh, kjgfdjg, kjgkgd], 2);
+		view = ListView();
+		this.assert(CVSync.all[view].isNil, "CVSync.all should hold no reference under view as key before connecting the SV to the ListView");
+		cv.connect(view);
+		this.assertEquals(CVSync.all[view].class, SVSync, "CVSync.all[view] should hold one SVSync after connecting the ListView to the SV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === SVSync }.size, 1, "The dependantsDictionary at our SV should include one instance of SVSync after connecting the SV to a ListView");
+		this.assertEquals(view.items, #[gfejhh, kjgfdjg, kjgkgd], "The items in the ListView should equal the list passed in with SV.new");
+		cv.value_(0);
+		this.assertEquals(view.value, 0, "After setting the SV's value the ListView's value should be set to the SV's value as well");
+		view.valueAction_(1);
+		this.assertEquals(cv.value, view.value, "After setting the ListView's value the SV's value should have been set to the ListView's value");
+		cv.disconnect(view);
+		view = PopUpMenu();
+		this.assert(CVSync.all[view].isNil, "CVSync.all should hold no reference under view as key before connecting the SV to the PopUpMenu");
+		cv.connect(view);
+		this.assertEquals(CVSync.all[view].class, SVSync, "CVSync.all[view] should hold one SVSync after connecting the PopUpMenu to the SV");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === SVSync }.size, 1, "The dependantsDictionary at our SV should include one instance of SVSync after connecting the SV to a PopUpMenu");
+		this.assertEquals(view.items, #[gfejhh, kjgfdjg, kjgkgd], "The items in the ListView should equal the list passed in with SV.new");
+		cv.value_(0);
+		this.assertEquals(view.value, 0, "After setting the SV's value the PopUpMenu's value should be set to the SV's value as well");
+		view.valueAction_(1);
+		this.assertEquals(cv.value, view.value, "After setting the PopUpMenu's value the SV's value should have been set to the PopUpMenu's value");
+		cv.disconnect(view);
 	}
 
 	test_disconnect {
@@ -295,6 +316,28 @@ TestCV : UnitTest {
 		this.assert(CVSync.all[view].isNil, "CVSync.all should hold no reference under view as key after disconnecting the CV 1 and 2 from the Slider2D");
 		this.assertEquals(dependantsDictionary[cv1].select { |d| d.class === CVSyncProperty }.size, 0, "The dependantsDictionary at our CV 1 should include no instance of CVSyncProperty after disconnecting CV 1 from the Slider2D");
 		this.assertEquals(dependantsDictionary[cv2].select { |d| d.class === CVSyncProperty }.size, 0, "The dependantsDictionary at our CV 2 should include no instance of CVSyncProperty after disconnecting CV 2 from the Slider2D");
+		cv = SV(#[gwrsd, ertfd], 0);
+		view = ListView();
+		cv.connect(view);
+		cv.disconnect(view);
+		this.assert(CVSync.all[view].isNil, "CVSync.all should hold no reference under view as key after disconnecting the CV from the ListView");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === SVSync }.size, 0, "The dependantsDictionary at our CV should include no instance of SVSync after disconnecting the CV from the ListView");
+		view = PopUpMenu();
+		cv.connect(view);
+		cv.disconnect(view);
+		this.assert(CVSync.all[view].isNil, "CVSync.all should hold no reference under view as key after disconnecting the CV from the PopUpMenu");
+		this.assertEquals(dependantsDictionary[cv].select { |d| d.class === SVSync }.size, 0, "The dependantsDictionary at our CV should include no instance of SVSync after disconnecting the CV from the PopUpMenu");
 	}
 
+	test_asControlInput {
+		var cv = CV.new;
+		this.assertFloatEquals(cv.asControlInput, cv.value, "Calling asControlInput on a one-dimensional CV should return the CV's value");
+	}
+
+	test_asOSCArgEmbeddedArray {
+		var cv = CV.new;
+		this.assertEquals(cv.asOSCArgEmbeddedArray([1, 2, 3, 4]), [1, 2, 3, 4, 0], "Calling asOSCArgEmbeddedArray on the CV should return the given array appended by the CV's value");
+		cv.value_([0.1, 0.3, 0.4]);
+		this.assertEquals(cv.asOSCArgEmbeddedArray([1, 2, 3, 4]), [1, 2, 3, 4, $[, 0.1, 0.3, 0.4, $]], "Calling asOSCArgEmbeddedArray on a CV whose value is an Array should return the Array given in asOSCArgEmbeddedArray appended by the CV's value where value's opening and closing brackets are in included as Chars");
+	}
 }
