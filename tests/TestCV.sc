@@ -340,4 +340,27 @@ TestCV : UnitTest {
 		cv.value_([0.1, 0.3, 0.4]);
 		this.assertEquals(cv.asOSCArgEmbeddedArray([1, 2, 3, 4]), [1, 2, 3, 4, $[, 0.1, 0.3, 0.4, $]], "Calling asOSCArgEmbeddedArray on a CV whose value is an Array should return the Array given in asOSCArgEmbeddedArray appended by the CV's value where value's opening and closing brackets are in included as Chars");
 	}
+
+	test_indexedBy {
+		var stream, cv = CV([0, 5].asSpec).value_([1, 2, 3]);
+		stream = Pbind(
+			\myKey, Pseq(#[0, 2]),
+			\cvKey, cv.indexedBy(\myKey)
+		).asStream;
+		this.assertEquals(stream.next(()), (cvKey: 1, myKey: 0), "CV:-indexedBy: The event returned by stream.next(()) should hold 1 as that's the CV's value under at position 0");
+		this.assertEquals(stream.next(()), (cvKey: 3, myKey: 2), "CV:-indexedBy: The event returned by stream.next(()) should hold 3 as that's the CV's value under at position 2");
+		this.assertEquals(stream.next(()), nil, "CV:-indexedBy: stream.next(()) should return nil as the Pseq under \myKey hold's only two values in its Array and should only play once");
+	}
+
+	test_windex {
+		var cv = CV([0, 5]).value_([1, 2, 3, 4]);
+		var pfunc1 = Pseed(1000, Pfunc { [1, 2, 3, 4].normalizeSum.windex }).asStream;
+		var pfunc2 = Pseed(1000, cv.windex).asStream;
+		this.assertEquals(pfunc1.next, pfunc2.next, "A Pfunc in a Pseed, that calls windex on a sum-normalized Array that equals the current value of a CV should return exactly the same value as an equally seeded Pseed that holds cv.windex");
+	}
+
+	test_size {
+		var cv = CV([0!5, 5!5]);
+		this.assertEquals(cv.size, cv.spec.size, "Calling size on a CV should return the size of its ControlSpec");
+	}
 }

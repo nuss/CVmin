@@ -33,10 +33,12 @@ CVSync {
 	value { cv.input = view.value }		// called when view changes
 
 	// called onClose and
-	// CV:-disconnect
-	*value { |view| 					// called onClose
+	// in CV:-disconnect
+	*value { |view|
 		all[view].do(_.remove);
-		all[view] = nil
+		// NOTE: it's not sufficient to remove all CVSyncs connected to the CV
+		// setting CVs to nil will automatically remove them from the dependantsDictionary!
+		all[view] = nil;
 	}
 
 	remove { cv.removeDependant(this) }
@@ -130,7 +132,6 @@ CVSyncProps {
 	new { |cv, view| ^CVSyncProperties(cv, view, props) }
 }
 
-
 SVSync : CVSyncValue {
 	init {
 		this.update(cv, \items);
@@ -146,13 +147,10 @@ SVSync : CVSyncValue {
 
 }
 
-
-
 EVSync : CVSync {
 
 	linkToView {
 		view.action = this;
-		// CVSync.all[view] = CVSync.all[view].add(this);
 		all.put(view, this);
 		view.onClose = CVSync
 	}
@@ -167,38 +165,14 @@ EVSync : CVSync {
 
 }
 
-ConductorSync : CVSync {
-
-	linkToCV {
-		cv.player.addDependant(this); 		 	// when CV changes CVsync:update is called
-	}
-
-	linkToView {
-		view.action = this;
-		// CVSync.all[view] = CVSync.all[view].add(this);
-		all.put(view, this);
-		view.onClose = CVSync;
-	}
-
-	update { |changer, what ...moreArgs|	// called when CV changes
-		switch( what,
-			\synch, { defer { view.value = cv.player.value } }
-		);
-	}
-
-	value { |m,c,v| if (view.value == 0) { cv.stop } { cv.play } }		// called when view changes
-
-}
-
 // use TextFields, TextViews and StaticTexts in CVs
 // pre-condition: texts must compile to arrays of numbers
-
 CVSyncText : CVSync {
 	classvar <>valRound=0.01;
 
 	update { |changer, what ... moreArgs|
 		switch( what,
-			\synch, { defer { view.string = cv.value.collect(_.round(valRound)).asCompileString }; }
+			\synch, { defer { view.string = cv.value.collect(_.round(valRound)).asCompileString } }
 		);
 	}
 

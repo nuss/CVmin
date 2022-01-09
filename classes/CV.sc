@@ -76,6 +76,10 @@ CV : Stream {
 	asInput { |val| ^this.spec.unmap(val) }
 
 	default_ { |val|
+		this.prDefault(val);
+	}
+
+	prDefault { |val|
 		var min = min(this.spec.minval, this.spec.maxval);
 		var max = max(this.spec.minval, this.spec.maxval);
 		if ((min <= val).and(val <= max)) { this.spec.default_(this.spec.constrain(val)) };
@@ -145,10 +149,7 @@ CV : Stream {
 	}
 
 	// nifty hack:
-	// CVSync.value(view) removes the object
-	// in CVSync.all and sets it to nil.
-	// Hence, it is also removed from the
-	// Object.dependantsDictionary
+	// see CVSync:*value
 	disconnect { |view|
 		CVSync.value(view);
 	}
@@ -160,21 +161,15 @@ CV : Stream {
 	}
 
 	indexedBy { |key|
-		^Pfunc{ |ev| value.at(ev[key] ) }
+		^Pfunc{ |ev| value.at(ev[key]) }
 	}
 
-	windex { |key|
-		^Pfunc{ |ev|
+	windex {
+		^Pfunc{
 			value.asArray.normalizeSum.windex
 		}
 	}
 
-	at { | index | ^value.at(index) }
-
-	put { | index, val |
-		value = value.putt(index, val)
-	}
-
-	size { ^value.size }
+	size { ^spec.size }
 
 }

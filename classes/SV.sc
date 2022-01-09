@@ -11,12 +11,14 @@ SV : CV {
 	*new { |items, default|
 		// superclass CV's has two arguments
 		// simply pass in nil for them
-		^super.newCopyArgs(nil, nil, items).init(default);
+		^super.newCopyArgs(nil, nil, items.collect(_.asSymbol)).init(default);
 	}
 
 	init { |default|
+		// hmmm...
+		items ?? { items = [\nil] };
 		this.spec_(ControlSpec(0, items.size - 1, \lin, 1, default ? 0));
-		this.value_(default);
+		this.value_(default ? 0);
 	}
 
 	default_ { |value|
@@ -26,32 +28,32 @@ SV : CV {
 		} {
 			default = value;
 		};
-		super.default_(default);
+		this.prDefault(default);
 	}
 
 	items_ { |argItems|
-		items = argItems ? [\nil];
+		items = argItems.collect(_.asSymbol);
 		super.sp(this.spec.default, 0, items.size - 1, 1, 'lin');
 		this.changed(\items);
 	}
 
 	item { ^items[this.value] }
 
-	item_ { |symbol|
-		this.value = this.getIndex(symbol);
+	item_ { |item|
+		this.value = this.getIndex(item.asSymbol);
 	}
 
-	getIndex { |symbol|
-		items.do { |it, i| if (symbol == it) { ^i } };
+	getIndex { |item|
+		items.collect(_.asSymbol).do { |it, i| if (item == it) { ^i } };
 		^0
 	}
 
-	sp { |default = 0, symbols|
-		this.items_(symbols);
+	sp { |default = 0, items|
+		this.items_(items);
 		this.default_(default);
 	}
 
-	next { ^items[value] }
+	next { ^items[this.value] }
 
 }
 
