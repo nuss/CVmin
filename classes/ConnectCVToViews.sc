@@ -21,6 +21,7 @@ CVSync {
 	linkToView {
 		view.action = this;
 		all.put(view, this);
+		// will call value(view) on close
 		view.onClose = this.class;
 	}
 
