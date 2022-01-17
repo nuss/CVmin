@@ -49,7 +49,7 @@ EV : CV {
 		var retVal = value.copy;
 		if (rateWarp.notNil) {
 			retVal.levels = retVal.levels.midiratio;
-			retVal =  retVal.rateWarp;
+			retVal = retVal.rateWarp;
 		};
 		^retVal.asArray.asOSCArgEmbeddedArray(array);
 	}

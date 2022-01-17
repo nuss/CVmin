@@ -65,4 +65,11 @@ TestEV : UnitTest {
 		this.assertArrayFloatEquals(ev.value.times, t, "The EV value's (an Env) times should equal the differentiated values of the view value's times from index 1 to the end, multiplie by the EV's duration");
 	}
 
+	test_asOSCArgEmbeddedArray {
+		var ev = EV(default: Env.adsr);
+		this.assertEquals(ev.asOSCArgEmbeddedArray([1, 3, 5, 7]), [1, 3, 5, 7, $[, 0.0, 3, 2, -99, 1.0, 0.01, 5, -4.0, 0.5, 0.3, 5, -4.0, 0.0, 1.0, 5, -4.0, $]], "Calling EV:-asOSCArgEmbeddedArray should return an array with the array passed in prepended. Array brackets of the sub-array should be returned as chars");
+		ev.rateWarp_(\exp);
+		// this.assertEquals(ev.asOSCArgEmbeddedArray([1, 3, 5, 7]), [1, 3, 5, 7, $[, 1.0, 3, 2, -99, 1.0594630943591, 0.0097139689195538, 2, 0, 1.0293022366434, 0.28727100000412, 2, 0, 1.0, 0.98562894275674, 2, 0, $]], "If a rateWarp is given for the EV the Env array is returned with midiratio applied on it");
+	}
+
 }
