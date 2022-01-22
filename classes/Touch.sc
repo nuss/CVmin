@@ -1,8 +1,11 @@
+// It remains unclear to me what this class is supposed to do
+// Though below example creates a Conductor GUI and sliders under certain
+// circumstances 'magically' move I fail to understand the magic behind it...
 
-/* 
-Touch provides a "touch" style control for CV's.  
+/*
+Touch provides a "touch" style control for CV's.
 The CV responds in a normal manner as long as it is untouched.
-When the Touch is changed, the CV is changed to the new value and becomes 'touched'
+When the 0.0Touch is changed, the CV is changed to the new value and becomes 'touched'
 
 Changes to a touched CV are gradually interpolated into place.
 The interpolation value is directly related to how long ago the CV was touched.
@@ -14,34 +17,34 @@ Touch acts both as a controlspec and as a surrogate CV.
 
 example:
 (
-a = Conductor.make{| con, a| 
+a = Conductor.make{| con, a|
 	~touchA = a.touch(10);
-	con.gui.keys = con.gui.keys.add(\touchA);	
+	con.gui.keys = con.gui.keys.add(\touchA);
 };
 
 a.show;
 
-) 
+)
 */
 Touch : ControlSpec {
 	var <>cv, <>newInput,  <>touchInput;
 	var <>untouchedFlag, <>dur, <>delta, <>startTime;
-	
-	*new { | spec, cv, dur, delta |
+
+	*new { |spec, cv, dur, delta|
 		^super.new(spec.minval, spec.maxval, spec.warp, spec.step, spec.default, spec.units)
 			.cv_(cv).dur_(dur ? 1).delta_(delta ? 0.05).untouchedFlag_(true)
 	}
-	
+
 	asTouch {^this}
 
 // Touch replaces the CV's standard constrain with its own
 // It is the same as before for untouched CV's
 // CV's that have been touched have their values updated by the function being
 // scheduled by AppClock
-	constrain { | val|
+	constrain { |val|
 		if (untouchedFlag) {
 			val = super.constrain(val);		// constrain value
-			cv.setValue(val);				// set the value of the CV 
+			cv.setValue(val);				// set the value of the CV
 			this.changed(\synch);			// so we can update the Touch's dependents
 			^val;						// then return the value to the CV
 										// which will set its value once again
@@ -51,18 +54,19 @@ Touch : ControlSpec {
 			^cv.value
 		}
 	}
-	
+
 	cmdPeriod { untouchedFlag = true }
-	
-	touch { | in |
+
+	touch { |in|
 		touchInput = in max: 0 min: 1;
 		newInput = touchInput;
 		startTime = Main.elapsedTime;
 		if (untouchedFlag) {
 			untouchedFlag = false;
 			CmdPeriod.add(this);
-			AppClock.sched (0, { var interp;
-				
+			AppClock.sched (0, {
+				var interp;
+
 				interp = Main.elapsedTime - startTime/dur.value min: 1 ;
 				cv.setValue(this.map((interp * newInput) + (1 - interp * touchInput)));
 				this.changed(\synch);		// update dependents of both the Touch
@@ -75,29 +79,21 @@ Touch : ControlSpec {
 					nil
 				}
 			});
-			
-		};
-	}	
 
-	input_ { | in | 
-		this.touch(in);
-		cv.setValue(this.map(in max: 0 min: 1)) 
+		};
 	}
-	value_ { | val | 
+
+	input_ { |in|
+		this.touch(in);
+		cv.setValue(this.map(in max: 0 min: 1))
+	}
+	value_ { |val|
 		this.touch(this.unmap(val));
 		cv.setValue(super.constrain(val));
-		this.changed(\synch); 
+		this.changed(\synch);
 	}
 
 	input { ^this.unmap(cv.value) }
 	value { ^cv.value }
-
-	draw { |win, name =">"|
-		if (this.value.isKindOf(Array) ) {
-			~multicvGUI.value(win, name, this);
-		} {
-			~cvGUI.value(win, name, this);
-		}
-	}		
 
 }
