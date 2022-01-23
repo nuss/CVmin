@@ -7,7 +7,6 @@ CVSync {
 
 	*new { |cv, view| ^super.newCopyArgs(cv, view).init }
 
-
 	init {
 		this.linkToCV;
 		this.linkToView;
