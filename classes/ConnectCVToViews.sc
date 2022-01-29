@@ -32,7 +32,7 @@ CVSync {
 
 	value { cv.input = view.value }		// called when view changes
 
-	// called onClose and
+	// called for view.onClose and
 	// in CV:-disconnect
 	*value { |view|
 		all[view].do(_.remove);
