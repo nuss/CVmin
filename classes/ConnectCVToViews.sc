@@ -69,14 +69,12 @@ CVSyncValue : CVSync {				// used by NumberBox
 CVSyncMulti : CVSync {
 
 	linkToView {
-		view.thumbSize = (view.bounds.width - 16 / cv.value.size);
+		view.thumbSize = view.bounds.width - 16 / cv.value.size;
 		view.isFilled_(true);
 		view.elasticMode_(true);
 		view.xOffset = 0;
 		view.valueThumbSize = 1;
 		view.mouseUpAction = this;
-
-		// CVSync.all[view] = CVSync.all[view].add(this);
 		all.put(view, this);
 		view.onClose = CVSync;
 	}
@@ -89,7 +87,9 @@ CVSyncMulti : CVSync {
 CVSyncProperty : CVSync {
 	var <>property;
 
-	*new { |cv, view, property| ^super.newCopyArgs(cv, view, property).init }
+	*new { |cv, view, property|
+		^super.newCopyArgs(cv, view, property).init;
+	}
 
 	update { |changer, what ...moreArgs|
 		switch( what,
