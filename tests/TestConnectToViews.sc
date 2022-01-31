@@ -140,3 +140,24 @@ TestCVSyncProperty : UnitTest {
 	}
 
 }
+
+TestCVSyncProperties : UnitTest {
+
+	test_new {
+		var cv1 = CV.new;
+		var cv2 = CV.new;
+		var view = Slider2D.new;
+		var sync = CVSyncProperties([cv1, cv2], view, #[xValue, yValue]);
+		this.assertEquals(sync.view, view, "The CVSyncProperties instance var view should hold the view (a Slider2D)");
+		this.assertEquals(sync.links.collect(_.class), [CVSyncProperty, CVSyncProperty], "The CVSyncProperties instance var links should hold an array of two CVSyncProperty instances");
+		this.assertEquals(sync.links[0].cv, cv1, "The CVSyncProperties' instance var links at position 0, a CVSyncProperty, should hold the CV cv1 in its instance var cv");
+		this.assertEquals(sync.links[1].cv, cv2, "The CVSyncProperties' instance var links at position 1, a CVSyncProperty, should hold the CV cv2 in its instance var cv");
+		this.assertEquals(sync.links[0].property, \xValue, "The CVSyncProperty at position 0 in links should hold the property \xValue");
+		this.assertEquals(sync.links[1].property, \yValue, "The CVSyncProperty at position 0 in links should hold the property \yValue");
+		this.assertEquals(CVSync.all[view], sync, "CVSync.all at key identical to the view should hold the CVSyncProperties instance");
+		view.close;
+		this.wait({ CVSync.all[view].isNil }, "Dependants were not removed within 0.2 seconds", 0.2);
+		this.assert(CVSync.all[view].isNil, "Upon closing the connected Slider2D the CVSyncProperties instance held in CVSync.all at key identical to the Slider2D instance should be removed");
+	}
+
+}
