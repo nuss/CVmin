@@ -161,3 +161,41 @@ TestCVSyncProperties : UnitTest {
 	}
 
 }
+
+TestCVSyncProps : UnitTest {
+
+	test_new {
+		var cvs = [CV.new, CV.new];
+		var view = Slider2D.new;
+		var sync, syncProps = CVSyncProps(#[xValue, yValue]);
+		this.assertEquals(syncProps.props, #[xValue, yValue], "The instance var props should be an array [\xValue, yValue]");
+		sync = syncProps.new(cvs, view);
+		this.assertEquals(sync.class, CVSyncProperties, "Calling syncProps.new with arguments cv, view should have created a new CVSyncProperties instance");
+	}
+
+}
+
+TestSVSync : UnitTest {
+
+	test_new {
+		var sv = SV(#[aaa, bbb, ccc], 1);
+		var view = ListView.new;
+		var sync = SVSync(sv, view);
+		this.assertEquals(CVSync.all[view], sync, "After instantiating a new SVSync CVSync.all should hold the SVSync at the key identical to the view");
+		this.assertEquals(sv.item, \bbb, "The sv's item should be the item at the index denoted by argument default");
+	}
+
+	test_update {
+		var sv = SV(#[aaa, bbb, ccc], 1);
+		var view = ListView.new;
+		var sync = SVSync(sv, view);
+		sv.value_(2);
+		sync.update(\synch);
+		this.assertEquals(view.value, 2, "After setting the SV's value and calling update with argument \synch the view's value should have been set to the SV's value");
+		sv.items_(#[sss, eee, vvv]);
+		sync.update(\items);
+		this.assertEquals(view.items, #[sss, eee, vvv], "After setting the SV's items and calling update with argument \items the views items should have been set to the SV's items");
+	}
+
+}
+

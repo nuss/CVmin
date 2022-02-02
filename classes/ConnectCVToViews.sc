@@ -129,7 +129,13 @@ CVSyncProperties : CVSync {
 CVSyncProps {
 	var <>props;
 	*new { |props| ^super.newCopyArgs(props) }
-	new { |cv, view| ^CVSyncProperties(cv, view, props) }
+	// cvs must have the same size as props
+	new { |cvs, view|
+		if (cvs.size != props.size) {
+			Error("cvs in CVSyncProps:-new must be an array of the same size as argument props!").throw;
+		};
+		^CVSyncProperties(cvs, view, props)
+	}
 }
 
 SVSync : CVSyncValue {
