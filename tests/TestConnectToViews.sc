@@ -199,3 +199,56 @@ TestSVSync : UnitTest {
 
 }
 
+TestEVSync : UnitTest {
+
+	test_linkToView {
+		var cv = EV.new;
+		var view = EnvelopeView.new;
+		var sync = EVSync(cv, view);
+		this.assertEquals(CVSync.all[view], sync, "After instantiating a new EVSync CVSync.all should hold the EVSync at the key identical to the view");
+		this.assertEquals(view.action, sync, "The view's action should be identical with the EVSync instance");
+		view.close;
+		this.wait({ CVSync.all[view].isNil }, "Dependants were not removed within 0.2 seconds", 0.2);
+		this.assert(CVSync.all[view].isNil, "Upon closing the connected EnvelopeView the EVSync instance held in CVSync.all at key identical to the EnvelopeView instance should be removed");
+	}
+
+	test_update {
+		var cv = EV.new;
+		var view = EnvelopeView.new;
+		var sync = EVSync(cv, view);
+		cv.value_(Env([ 0.0, 0.4, 0.3, 0.0 ], [ 0.1, 0.4, 0.5 ], [ 0, 0 ]));
+		sync.update(what: \synch);
+		this.assertEquals(view.value, [[0.0, 0.1, 0.5, 1.0], [0.0, 0.4, 0.3, 0.0]], "After calling update(\synch) on the EVSync instance the view should update its value to the newly set Envelope");
+	}
+
+	test_value {
+		var cv = EV.new;
+		var view = EnvelopeView.new;
+		var sync = EVSync(cv, view);
+		view.value_([[0.0, 0.1, 0.5, 1.0], [0.0, 0.4, 0.3, 0.0]]);
+		sync.value;
+		this.assertEquals(cv.value.cs, Env([ 0.0, 0.4, 0.3, 0.0 ], [ 0.1, 0.4, 0.5 ], [ 0, 0 ]).cs, "After calling value on the EVSync instance the EV's value should be updated according to the view's value");
+	}
+
+}
+
+TestCVSyncText : UnitTest {
+
+	test_update {
+		var cv = CV([0!5, 5!5].asSpec);
+		var view = TextField.new;
+		var sync = CVSyncText(cv, view);
+		cv.value_([0.1, 0.03, 0.5, 0.003, 0.2]);
+		sync.update(what: \synch);
+		this.assertEquals(view.value, [0.1, 0.03, 0.5, 0.0, 0.2].cs, "After calling update with argument what set to \synch the view's value should be updated to the CV's  value, rounded to the precision given in classvar valRound");
+	}
+
+	test_value {
+		var cv = CV([0!5, 5!5].asSpec);
+		var view = TextField.new;
+		var sync = CVSyncText(cv, view);
+		view.string_([0.1, 0.03, 0.005, 0.3, 0.2].cs);
+		sync.value;
+		this.assertEquals(cv.value, [0.1, 0.03, 0.005, 0.3, 0.2], "After calling value on the CVSyncText the CV's value should be set to the view's interpreted string");
+	}
+}
