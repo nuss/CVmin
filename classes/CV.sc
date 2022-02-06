@@ -172,4 +172,20 @@ CV : Stream {
 
 	size { ^spec.size }
 
+	*runTests {
+		TestCV.run;
+		TestSV.run;
+		TestEV.run;
+		TestCVSync.run;
+		TestCVSyncValue.run;
+		TestCVSyncMulti.run;
+		TestCVSyncProperty.run;
+		TestCVSyncProperties.run;
+		TestCVSyncProps.run;
+		TestSVSync.run;
+		TestEVSync.run;
+		TestCVSyncText.run;
+		TestArrayCV.run;
+	}
+
 }

@@ -251,4 +251,5 @@ TestCVSyncText : UnitTest {
 		sync.value;
 		this.assertEquals(cv.value, [0.1, 0.03, 0.005, 0.3, 0.2], "After calling value on the CVSyncText the CV's value should be set to the view's interpreted string");
 	}
+
 }
