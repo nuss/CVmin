@@ -3,7 +3,7 @@ CVEvent {
 
 
 	*initClass {
-	// These events create synths, groups, and buses with CVs linked to their controls
+		// These events create synths, groups, and buses with CVs linked to their controls
 		Class.initClassTree(Event);
 		CVEvent.bufferEvent = (
 			msg: \wave, 				// \cheby, \wave, \signal
@@ -45,19 +45,19 @@ CVEvent {
 			},
 
 			get: { | ev, del = 0 |
-					Task({
-						del.wait;
-						ev[\server].sync;
-						ev[\buffer].getn(0, ev[\display].value.size, { | vals|
-							if (ev[\msg] != \signal) {
-								vals = vals.clump(2).collect { |a|
-									[ a[0], a[0] + a[1] ]
-								}.flatten
-							};
-							ev[\display].value_(vals)
-						});
-					}).play;
-				}
+				Task({
+					del.wait;
+					ev[\server].sync;
+					ev[\buffer].getn(0, ev[\display].value.size, { | vals|
+						if (ev[\msg] != \signal) {
+							vals = vals.clump(2).collect { |a|
+								[ a[0], a[0] + a[1] ]
+							}.flatten
+						};
+						ev[\display].value_(vals)
+					});
+				}).play;
+			}
 		);
 
 		CVEvent.synthEvent = (
@@ -87,8 +87,8 @@ CVEvent {
 				if (ids.isNil ) { ids = msgs.collect { server.nextNodeID } };
 				bndl = ids.collect { |id, i|
 					[\s_new, instrumentName, id, addAction, group]
-					 ++ msgs[i]
-					 ++ cvs.connectToNode( server, id);
+					++ msgs[i]
+					++ cvs.connectToNode( server, id);
 				};
 
 				if ((addAction == 0) || (addAction == 3)) {
@@ -159,7 +159,7 @@ CVEvent {
 		);
 		CVEvent.actionEvent = ( asEventStreamPlayer: #{|ev| ev } );
 
-//		Event.parentEvents[\synthEvent] = CVEvent.synthEvent;
-//		Event.parentEvents[\groupEvent] = CVEvent.groupEvent;
+		//		Event.parentEvents[\synthEvent] = CVEvent.synthEvent;
+		//		Event.parentEvents[\groupEvent] = CVEvent.groupEvent;
 	}
 }

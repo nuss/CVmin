@@ -49,6 +49,7 @@ CVPreset {
 		items.do { | p, i | p.input_(preset[i]) }
 	}
 
+	// TODO: move to Conductor
 	draw { |win, name, preset|
 		~presetGUI.value(win, name, this)
 	}

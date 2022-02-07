@@ -9,7 +9,7 @@
 			this.default.size
 		].maxItem;
 
-		^if(size > 1, { size }, { 1 });
+		^if(size > 1) { size } { 1 };
 	}
 
 	// split a multi-dimensional ControlSpec into an array of one-dimensional ControlSpecs

@@ -58,6 +58,7 @@ CVInterpolator : CVPreset {
 		})
 	}
 
+	// TODO: move to Conductor
 	draw { |win, name, preset|
 		~presetGUI.value(win, name, this);
 		~interpolatorGUI.value(win, name, this)
