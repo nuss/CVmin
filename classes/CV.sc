@@ -123,10 +123,9 @@ CV : Stream {
 			TextView:		CVSyncText,
 			TextField:		CVSyncText,
 			StaticText:		CVSyncText,
+			RangeSlider:	CVSyncProps(#[loValue, hiValue]),
+			Slider2D: 		CVSyncProps(#[xValue, yValue])
 		);
-
-		connectDictionary[\RangeSlider] = CVSyncProps(#[loValue, hiValue]);
-		connectDictionary[\Slider2D] = CVSyncProps(#[xValue, yValue]);
 
 		this.viewDictionary = IdentityDictionary.new;
 
