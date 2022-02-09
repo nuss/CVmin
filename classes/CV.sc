@@ -113,35 +113,31 @@ CV : Stream {
 
 	*buildViewDictionary {
 		var connectDictionary = (
-			numberBox:		CVSyncValue,
-			slider:			CVSyncInput,
-			multiSliderView: CVSyncMulti,
-			popUpMenu:		SVSync,
-			listView:		SVSync,
-			knob:			CVSyncInput,
-			button:			CVSyncValue,
-			textView:		CVSyncText,
-			textField:		CVSyncText,
-			staticText:		CVSyncText,
+			NumberBox:		CVSyncValue,
+			Slider:			CVSyncInput,
+			MultiSliderView: CVSyncMulti,
+			PopUpMenu:		SVSync,
+			ListView:		SVSync,
+			Knob:			CVSyncInput,
+			Button:			CVSyncValue,
+			TextView:		CVSyncText,
+			TextField:		CVSyncText,
+			StaticText:		CVSyncText,
 		);
 
-		connectDictionary.rangeSlider = CVSyncProps(#[loValue, hiValue]);
-		connectDictionary.slider2D = CVSyncProps(#[xValue, yValue]);
+		connectDictionary[\RangeSlider] = CVSyncProps(#[loValue, hiValue]);
+		connectDictionary[\Slider2D] = CVSyncProps(#[xValue, yValue]);
 
 		this.viewDictionary = IdentityDictionary.new;
 
-		GUI.schemes.do { |gui|
-			var class;
-			#[
-				numberBox, slider, rangeSlider, slider2D, multiSliderView,
-				popUpMenu, listView, knob, button, textView, textField, staticText
-			].collect { |name|
-				if ((class = gui.perform(name)).notNil) {
-					class = class.superclass;
-					this.viewDictionary.put(class, connectDictionary.at(name))
-				}
+		[
+			NumberBox, Slider, RangeSlider, Slider2D, MultiSliderView,
+			PopUpMenu, ListView, Knob, Button, TextView, TextField, StaticText
+		].collect { |class|
+			if (class.notNil) {
+				this.viewDictionary.put(class, connectDictionary.at(class.asSymbol))
 			}
-		};
+		}
 	}
 
 	connect { |view|
