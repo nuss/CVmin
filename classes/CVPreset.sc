@@ -15,18 +15,19 @@ CVPreset {
 	}
 
 	value  {  ^[[], presets] }
-	value_ { | v| this.presets = v[1]; }
+	// what is v expected to be?
+	value_ { |v| this.presets = v[1]; }
 
-	input_ { | input | input.do { |in, i|	items[i].input_(in)} }
+	input_ { |input| input.do { |in, i|	items[i].input_(in)} }
 	input { ^items.collect{|cv| cv.input } }
 
-	asInput { | vals | vals.collect { | v, i | items[i].asInput(v) } }
+	asInput { |vals| vals.collect { |v, i| items[i].asInput(v) } }
 
 //	input_ { | input | presetCV.input_(input) }
 //	input { ^presetCV.input }
 
 
-	presets_ { | argPresets|
+	presets_ { |argPresets|
 		presets = argPresets;
 		presetCV.spec.maxval = presets.size;
 	}
@@ -36,14 +37,14 @@ CVPreset {
 		presetCV.spec.maxval = presets.size;
 	}
 
-	removePreset { arg index;
+	removePreset { |index|
 		if (presets.notNil, {
 			presets.removeAt(index);
 			presetCV.spec.maxval = presets.size;
 		});
 	}
 
-	set { arg index;
+	set { |index|
 		var preset;
 		preset = presets[index];
 		items.do { | p, i | p.input_(preset[i]) }
