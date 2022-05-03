@@ -25,7 +25,8 @@ CVSpecs {
 
 				audiobus: 	ControlSpec(0, 127, step: 1),
 				controlbus: ControlSpec(0, 4095, step: 1),
-				audioin: 	ControlSpec(0, Server.default.options.firstPrivateBus-1, step: 1),
+				audioin: 	ControlSpec(0, Server.default.options.numInputBusChannels-1, step: 1),
+				audioout:   ControlSpec(0, Server.default.options.numOutputBusChannels-1, step: 1),
 				privatein: 	ControlSpec(Server.default.options.firstPrivateBus, 4095, step: 1),
 				in: 		ControlSpec(0, 4095, step: 1),
 				fin: 		ControlSpec(0, 4095, step: 1),

@@ -1,0 +1,8 @@
+(
+	name: "CVmin",
+	summary: "A subset of the Conductor quark by Ron Kuivilla. CVmin only contains CV and its subclasses but not Conductor itself. CV and its subclasses have been slightly modified and unit-tested, yet should be interchangeable with the original CV class from the Conductor class",
+	version: "0.1.0",
+	schelp: "CVmin.schelp",
+	copyright: "Ronald Kuivilla, Stefan Nussbaumer",
+	license: "GPL3"
+)
