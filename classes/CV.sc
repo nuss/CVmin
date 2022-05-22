@@ -129,12 +129,13 @@ CV : Stream {
 
 		this.viewDictionary = IdentityDictionary.new;
 
+
 		[
-			NumberBox, Slider, RangeSlider, Slider2D, MultiSliderView,
-			PopUpMenu, ListView, Knob, Button, TextView, TextField, StaticText
+			\NumberBox, \Slider, \RangeSlider, \Slider2D, \MultiSliderView,
+			\PopUpMenu, \ListView, \Knob, \Button, \TextView, \TextField, \StaticText
 		].collect { |class|
-			if (class.notNil) {
-				this.viewDictionary.put(class, connectDictionary.at(class.asSymbol))
+			class.asClass !? {
+				this.viewDictionary.put(class.asClass, connectDictionary.at(class))
 			}
 		}
 	}
