@@ -11,12 +11,15 @@ SV : CV {
 	*new { |items, default|
 		// superclass CV's has two arguments
 		// simply pass in nil for them
-		^super.newCopyArgs(nil, nil, items.collect(_.asSymbol)).init(default);
+		^super.new.init(items, default);
 	}
 
-	init { |default|
-		// hmmm...
-		items ?? { items = [\nil] };
+	init { |argItems, default|
+		if (argItems.notNil and: { argItems.isKindOf(Collection) }) {
+			items = argItems.collect(_.asSymbol);
+		} {
+			items = [\nil];
+		};
 		this.spec_(ControlSpec(0, items.size - 1, \lin, 1, default ? 0));
 		this.value_(default ? 0);
 	}
