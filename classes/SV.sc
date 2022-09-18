@@ -9,8 +9,6 @@ SV : CV {
 	var <items;
 
 	*new { |items, default|
-		// superclass CV's has two arguments
-		// simply pass in nil for them
 		^super.new.init(items, default);
 	}
 
