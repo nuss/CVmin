@@ -34,8 +34,8 @@ CV : Stream {
 	}
 
 	// SimpleControllers are easy to add and remove
-	// however, controllers remain 'hidden' to the users
-	// we're taking a shortcut here to Object's dependantsDictionary
+	// however, controllers remain 'hidden' to the users.
+	// We're taking a shortcut here to Object's dependantsDictionary
 	// that way a CV doesn't need its own list for bookkeeping
 	numControllers {
 		var allControllers, cvDependants = dependantsDictionary[this];

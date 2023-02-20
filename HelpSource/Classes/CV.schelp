@@ -139,33 +139,44 @@ When a CV's value is changed a changed message (identified by the symbol code::\
 
 Under normal circumstances, CV connections are automatically removed when the targeted link::Classes/Control::, link::Classes/Bus:: or link::Classes/View:: is deleted. If there is a program error, it is possible that connections will persist and will need to be explicitly removed.
 
-METHOD:: action
-Create a dependant SimpleController that evaluates the function whenever the CV's value is altered.
+METHOD:: addController
+Create and return a dependant link::Classes/SimpleController:: that evaluates the function whenever the CV's value is altered. Though the method takes a function as argument it is important to understand that it creates a new SimpleController. The function can not be updated or altered later, only the controller can be removed and a new one be added. The first argument passed to the function will always be the CV itself, making it easy to query the CV's current value or input.
 
-note::Though the method seems to be a setter emphasis::and:: getter it is emphasis::not:: in terms of sclang. calling code::action:: as getter will throw an error!::
+ARGUMENT:: function
+an arbitrary link::Classes/Function::
 
+returns:: a link::Classes/SimpleController::
+
+discussion::
 code::
 a = CV(\freq);
 // action_ returns a SimpleController
 // for an explicit removal it may be stored in a variable
-c = a.action_({ |cv| "the value of a is now %\n".postf(cv.value) });
+c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
 a.input_(0.7); // try with different values between 0 and 1
 a.value_(456); // or set the value explicitely
 // only remove c
 c.remove;
 a.input_(0.3); // no posts anymore
 // add the SimpleController again
-c = a.action_({ |cv| "the value of a is now %\n".postf(cv.value) });
+c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
 // and another one
-d = a.action_({ |cv| "the input of a is now %\n".postf(cv.input) });
+d = a.addController({ |cv| "the input of a is now %\n".postf(cv.input) });
 a.value_(456); // both, c and d's functions are triggered
 a.release; // remove all dependants at once
 ::
 
-ARGUMENT:: function
-an arbitrary link::Classes/Function::
+METHOD:: removeAllControllers
+Remove all link::Classes/SimpleController::s that have been added with link::#-addController::. Possibly it's more important to be able to remove single controllers. However, some CVs create controllers behind the sceneswhen being instantiated. The method aims to be a clean-up possibility, removing sideeffects.
 
-returns:: a link::Classes/SimpleController::
+METHOD:: asInput
+Return the in unmapped value of a CV.
+
+discussion::
+code::
+c = CV(\freq);
+c.asInput(100) // 0.23299000144534 - the unmapped value (input) for a frequency of 100 Hz
+::
 
 subsection:: GUI connections
 
@@ -435,25 +446,6 @@ The methods link::#-input#input and input_:: are also used by link::Classes/CVPr
 
 subsection:: more undocumented methods
 
-METHOD:: put
-(describe method here)
-
-ARGUMENT:: index
-(describe argument here)
-
-ARGUMENT:: val
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: asInput
-(describe method here)
-
-ARGUMENT:: val
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
 METHOD:: db
 (describe method here)
 
@@ -558,14 +550,6 @@ returns:: (describe returnvalue here)
 
 METHOD:: next
 (describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: windex
-(describe method here)
-
-ARGUMENT:: key
-(describe argument here)
 
 returns:: (describe returnvalue here)
 
