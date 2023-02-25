@@ -104,6 +104,13 @@ either 'linear' or 'exponential'
 
 In the case of exponential warp, min and max must be non-zero and the same sign.
 
+METHOD:: db
+Set the CV's spec to
+
+code::ControlSpec(-100, 20, \lin, 1, 0)::
+
+returns:: the CV
+
 subsection:: Accessing
 
 METHOD:: value
@@ -132,6 +139,10 @@ ARGUMENT:: key
 a link::Classes/Symbol::
 
 returns:: the value indexed by code::key::
+
+METHOD:: embedInStream
+
+returns:: the yielded value of the CV
 
 subsection:: CV connections using SimpleControllers
 
@@ -168,14 +179,33 @@ a.release; // remove all dependants at once
 
 METHOD:: removeAllControllers
 Remove all link::Classes/SimpleController::s that have been added with link::#-addController::. Possibly it's more important to be able to remove single controllers. However, some CVs create controllers behind the sceneswhen being instantiated. The method aims to be a clean-up possibility, removing sideeffects.
+NOTE:: code::removeAllControllers:: will only remove actions that have been added to the CV while keeping synchronisations with sliders and other views. However, CV also inherits a method link::Classes/Object#-release:: which will completly uninitialize the CV, removing all dependants.::
 
 METHOD:: asInput
-Return the in unmapped value of a CV.
+Return the in unmapped value of the given argument code::val:: (determined by the CV's link::CLasses/ControlSpec::). If an array of values is given an array of unmapped values will be returned. The given value strong::will not:: alter the CV's value.
+
+ARGUMENT:: val
+a single numerical value or an array of numerical values
 
 discussion::
 code::
 c = CV(\freq);
 c.asInput(100) // 0.23299000144534 - the unmapped value (input) for a frequency of 100 Hz
+::
+
+METHOD:: asOSCArgEmbeddedArray
+Appends the CV's current value as OSC compliant argument to the given link::Classes/Array::
+
+ARGUMENT:: array
+Usually an link::Classes/Array:: of numerical values.
+
+returns:: an OSC compliant representation of the CV's value appended to a given array
+
+discussion::
+code::
+c = CV.new;
+c.value_([0.1, 0.2, 0.3]);
+c.asOSCArgEmbeddedArray([1, 2, 3, 4, 5]).postcs; // [1, 2, 3, 4, $[, 0.1, 0.2, 0.3, $]]
 ::
 
 subsection:: GUI connections
@@ -445,47 +475,6 @@ MIDIIn.control = { arg src, chan, num, val;	a.input_(val/127) }
 The methods link::#-input#input and input_:: are also used by link::Classes/CVPreset:: to allow interpolations between settings that follow warp of the CV's link::Classes/ControlSpec::.
 
 subsection:: more undocumented methods
-
-METHOD:: db
-(describe method here)
-
-ARGUMENT:: default
-(describe argument here)
-
-ARGUMENT:: lo
-(describe argument here)
-
-ARGUMENT:: hi
-(describe argument here)
-
-ARGUMENT:: step
-(describe argument here)
-
-ARGUMENT:: warp
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: cvWidgetConnect
-(describe method here)
-
-ARGUMENT:: view
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: embedInStream
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: asOSCArgEmbeddedArray
-(describe method here)
-
-ARGUMENT:: array
-(describe argument here)
-
-returns:: (describe returnvalue here)
 
 METHOD:: reset
 (describe method here)
