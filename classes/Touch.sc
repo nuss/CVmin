@@ -1,7 +1,3 @@
-// It remains unclear to me what this class is supposed to do
-// Though below example creates a Conductor GUI and sliders under certain
-// circumstances 'magically' move I fail to understand the magic behind it...
-
 /*
 Touch provides a "touch" style control for CV's.
 The CV responds in a normal manner as long as it is untouched.
@@ -23,7 +19,6 @@ a = Conductor.make{| con, a|
 };
 
 a.show;
-
 )
 */
 Touch : ControlSpec {

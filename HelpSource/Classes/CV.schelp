@@ -144,43 +144,6 @@ METHOD:: embedInStream
 
 returns:: the yielded value of the CV
 
-subsection:: CV connections using SimpleControllers
-
-When a CV's value is changed a changed message (identified by the symbol code::\synch::) is send to update any dependant objects. For example, code::action_(function):: creates a link::Classes/SimpleController:: which is added to the dependants of the CV and evaluated whenever the CV changes value. This same basic mechanism is used to connect the CV to GUIs, server, objects, and some other objects in the language. Most of this is more or less hidden from view.
-
-Under normal circumstances, CV connections are automatically removed when the targeted link::Classes/Control::, link::Classes/Bus:: or link::Classes/View:: is deleted. If there is a program error, it is possible that connections will persist and will need to be explicitly removed.
-
-METHOD:: addController
-Create and return a dependant link::Classes/SimpleController:: that evaluates the function whenever the CV's value is altered. Though the method takes a function as argument it is important to understand that it creates a new SimpleController. The function can not be updated or altered later, only the controller can be removed and a new one be added. The first argument passed to the function will always be the CV itself, making it easy to query the CV's current value or input.
-
-ARGUMENT:: function
-an arbitrary link::Classes/Function::
-
-returns:: a link::Classes/SimpleController::
-
-discussion::
-code::
-a = CV(\freq);
-// action_ returns a SimpleController
-// for an explicit removal it may be stored in a variable
-c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
-a.input_(0.7); // try with different values between 0 and 1
-a.value_(456); // or set the value explicitely
-// only remove c
-c.remove;
-a.input_(0.3); // no posts anymore
-// add the SimpleController again
-c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
-// and another one
-d = a.addController({ |cv| "the input of a is now %\n".postf(cv.input) });
-a.value_(456); // both, c and d's functions are triggered
-a.release; // remove all dependants at once
-::
-
-METHOD:: removeAllControllers
-Remove all link::Classes/SimpleController::s that have been added with link::#-addController::. Possibly it's more important to be able to remove single controllers. However, some CVs create controllers behind the sceneswhen being instantiated. The method aims to be a clean-up possibility, removing sideeffects.
-NOTE:: code::removeAllControllers:: will only remove actions that have been added to the CV while keeping synchronisations with sliders and other views. However, CV also inherits a method link::Classes/Object#-release:: which will completly uninitialize the CV, removing all dependants.::
-
 METHOD:: asInput
 Return the in unmapped value of the given argument code::val:: (determined by the CV's link::CLasses/ControlSpec::). If an array of values is given an array of unmapped values will be returned. The given value strong::will not:: alter the CV's value.
 
@@ -207,6 +170,68 @@ c = CV.new;
 c.value_([0.1, 0.2, 0.3]);
 c.asOSCArgEmbeddedArray([1, 2, 3, 4, 5]).postcs; // [1, 2, 3, 4, $[, 0.1, 0.2, 0.3, $]]
 ::
+
+METHOD:: split
+Split a multi-value CV into an array of CVs.
+
+returns:: An link::Classes/Array:: of CVs
+
+discussion::
+code::
+c = CV([[0, 0, 0, 0, 0], [5, 5, 5, 5, 5]].asSpec);
+c.split; // [ a CV, a CV, a CV, a CV, a CV ]
+::
+
+METHOD:: next
+As CV inherits from link::Classes/Stream:: this method implements the method defined in the Stream interface. Calling this method simply returns the CV's value.
+
+returns:: A link::Classes/Float:: or an link::Classes/Integer:: or an link::Classes/Array:: of numeric values
+
+METHOD:: size
+Return the size of the CV's internal ControlSpec. I.e. a CV's value or input will be a single numeric value if the ControlSpec
+
+returns:: An link::Classes/Integer:: denoting the size of the CV's value
+
+METHOD:: touch
+
+METHOD:: asControlInput
+
+
+subsection:: CV connections using SimpleControllers
+
+When a CV's value is changed a changed message (identified by the symbol code::\synch::) is send to update any dependant objects. For example, code::action_(function):: creates a link::Classes/SimpleController:: which is added to the dependants of the CV and evaluated whenever the CV changes value. This same basic mechanism is used to connect the CV to GUIs, server, objects, and some other objects in the language. Most of this is more or less hidden from view.
+
+Under normal circumstances, CV connections are automatically removed when the targeted link::Classes/Control::, link::Classes/Bus:: or link::Classes/View:: is deleted. If there is a program error, it is possible that connections will persist and will need to be explicitly removed.
+
+METHOD:: addController
+Create and return a dependant link::Classes/SimpleController:: that evaluates the function whenever the CV's value is altered. Though the method takes a function as argument it is important to understand that it creates a new SimpleController. The function can not be updated or altered later, only the controller can be removed and a new one be added. The first argument passed to the function will always be the CV itself, making it easy to query the CV's current value or input.
+
+ARGUMENT:: function
+an arbitrary link::Classes/Function::
+returns:: a link::Classes/SimpleController::
+
+discussion::
+code::
+a = CV(\freq);
+// action_ returns a SimpleController
+// for an explicit removal it may be stored in a variable
+c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
+a.input_(0.7); // try with different values between 0 and 1
+a.value_(456); // or set the value explicitely
+// only remove c
+c.remove;
+a.input_(0.3); // no posts anymore
+// add the SimpleController again
+c = a.addController({ |cv| "the value of a is now %\n".postf(cv.value) });
+// and another one
+d = a.addController({ |cv| "the input of a is now %\n".postf(cv.input) });
+a.value_(456); // both, c and d's functions are triggered
+a.release; // remove all dependants at once
+::
+
+METHOD:: removeAllControllers
+Remove all link::Classes/SimpleController::s that have been added with link::#-addController::. Possibly it's more important to be able to remove single controllers. However, some CVs create controllers behind the sceneswhen being instantiated. The method aims to be a clean-up possibility, removing sideeffects.
+NOTE:: code::removeAllControllers:: will only remove actions that have been added to the CV while keeping synchronisations with sliders and other views. However, CV also inherits a method link::Classes/Object#-release:: which will completly uninitialize the CV, removing all dependants.::
 
 subsection:: GUI connections
 
@@ -473,91 +498,3 @@ MIDIIn.control = { arg src, chan, num, val;	a.input_(val/127) }
 ::
 
 The methods link::#-input#input and input_:: are also used by link::Classes/CVPreset:: to allow interpolations between settings that follow warp of the CV's link::Classes/ControlSpec::.
-
-subsection:: more undocumented methods
-
-METHOD:: reset
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: draw
-(describe method here)
-
-ARGUMENT:: win
-(describe argument here)
-
-ARGUMENT:: name
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: setValue
-(describe method here)
-
-ARGUMENT:: v
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: split
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: connect
-(describe method here)
-
-ARGUMENT:: view
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: cvWidgetDisconnect
-(describe method here)
-
-ARGUMENT:: object
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: touch
-(describe method here)
-
-ARGUMENT:: dur
-(describe argument here)
-
-ARGUMENT:: delta
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: asControlInput
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: next
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: size
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: at
-(describe method here)
-
-ARGUMENT:: index
-(describe argument here)
-
-returns:: (describe returnvalue here)
-
-
-EXAMPLES::
-
-code::
-(some example code)
-::
