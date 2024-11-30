@@ -90,5 +90,4 @@ Touch : ControlSpec {
 
 	input { ^this.unmap(cv.value) }
 	value { ^cv.value }
-
 }

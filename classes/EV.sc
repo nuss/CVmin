@@ -54,4 +54,11 @@ EV : CV {
 		^retVal.asArray.asOSCArgEmbeddedArray(array);
 	}
 
+	storeOn { |stream|
+		stream << this.class.name << "(" <<<* [this.spec, value] << ")"
+	}
+
+	printOn { |stream|
+		this.storeOn(stream)
+	}
 }	

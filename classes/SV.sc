@@ -33,8 +33,9 @@ SV : CV {
 	}
 
 	items_ { |argItems|
-		items = argItems.collect(_.asSymbol);
-		super.sp(this.spec.default, 0, items.size - 1, 1, 'lin');
+		argItems = argItems.collect(_.asSymbol);
+		items = argItems ? [\nil];
+		super.sp(this.spec.default, 0, argItems.size - 1, 1, 'lin');
 		this.changed(\items);
 	}
 
@@ -56,5 +57,12 @@ SV : CV {
 
 	next { ^items[this.value] }
 
+	storeOn { |stream|
+		stream << this.class.name << "(" <<<* [this.items] << ")"
+	}
+
+	printOn { |stream|
+		this.storeOn(stream)
+	}
 }
 

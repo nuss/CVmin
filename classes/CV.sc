@@ -168,6 +168,14 @@ CV : Stream {
 
 	size { ^spec.size }
 
+	storeOn { |stream|
+		stream << this.class.name << "(" <<<* [this.spec, value] << ")"
+	}
+
+	printOn { |stream|
+		this.storeOn(stream)
+	}
+
 	*runTests {
 		TestCV.run;
 		TestSV.run;
