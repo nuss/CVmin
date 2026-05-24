@@ -16,7 +16,7 @@
 	split {
 		var specs, thisMinval, thisMaxval, thisStep, thisDefault;
 
-		if (this.size > 1) {
+		if (this.size > 0) {
 			specs = Array.newClear(this.size);
 			this.size.do { |i|
 				if (minval.isArray) { thisMinval = minval.wrapAt(i) } { thisMinval = minval };
