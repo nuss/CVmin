@@ -98,7 +98,7 @@ CV : Stream {
 	split {
 		var specs;
 
-		if (this.spec.size > 1) {
+		if (this.spec.size > 0) {
 			specs = this.spec.split;
 			^value.collect { |v, i| CV(specs[i], v) }
 		}
