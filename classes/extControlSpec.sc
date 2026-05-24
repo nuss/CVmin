@@ -1,6 +1,6 @@
 +ControlSpec {
-
-	// multi-dimensional specs
+	// multichannel specs should return 1 or greater - analog to Collection:-size
+	// ortherwise 0 - analog to Object:-size
 	size {
 		var size = [
 			minval.size,
@@ -9,10 +9,10 @@
 			this.default.size
 		].maxItem;
 
-		^if(size > 1) { size } { 1 };
+		^size;
 	}
 
-	// split a multi-dimensional ControlSpec into an array of one-dimensional ControlSpecs
+	// split a multichannel ControlSpec into an array of one-dimensional ControlSpecs
 	split {
 		var specs, thisMinval, thisMaxval, thisStep, thisDefault;
 

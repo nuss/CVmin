@@ -361,6 +361,8 @@ TestCV : UnitTest {
 
 	test_size {
 		var cv = CV([0!5, 5!5]);
-		this.assertEquals(cv.size, cv.spec.size, "Calling size on a CV should return the size of its ControlSpec");
+		this.assertEquals(cv.size, cv.spec.size, "Calling size on a CV should return the size of its ControlSpec: 5)");
+		cv = CV.new;
+		this.assertEquals(cv.size, cv.spec.size, "Calling size on a CV should return the size of its ControlSpec: 0)");
 	}
 }
