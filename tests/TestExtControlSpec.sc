@@ -4,7 +4,7 @@ TestExtControlSpec : UnitTest {
 		var spec = ControlSpec([0, 0, 0, 0, 0], [5, 5, 5], \lin, [0, 0, 0, 0, 0, 0, 0], [2, 2, 2, 2]);
 		this.assertEquals(spec.size, 7, "ControlSpec:-size should return the maximum of minval.size, maxval.size, step.size, default.size");
 		spec = ControlSpec.new;
-		this.assertEquals(spec.size, 1, "By default a ControlSpec created with no parameters should return a size of 1");
+		this.assertEquals(spec.size, 0, "By default a ControlSpec created with no parameters should return a size of 0");
 	}
 
 	test_split {
